@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashHistoire</title>
+
+<style>
+
+body{
+font-family: Arial, sans-serif;
+margin:0;
+background: linear-gradient(135deg,#3a0ca3,#4361ee);
+color:white;
+text-align:center;
+}
+
+header{
+padding:20px;
+font-size:28px;
+font-weight:bold;
+}
+
+.container{
+padding:20px;
+}
+
+button{
+background:#ffd60a;
+border:none;
+padding:15px 25px;
+margin:10px;
+font-size:18px;
+border-radius:12px;
+cursor:pointer;
+}
+
+button:hover{
+transform:scale(1.05);
+}
+
+.card{
+width:300px;
+height:200px;
+margin:auto;
+perspective:1000px;
+}
+
+.card-inner{
+position:relative;
+width:100%;
+height:100%;
+transition:transform 0.6s;
+transform-style:preserve-3d;
+}
+
+.card.flip .card-inner{
+transform: rotateY(180deg);
+}
+
+.card-face{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+background:white;
+color:black;
+border-radius:15px;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:20px;
+box-shadow:0 10px 20px rgba(0,0,0,0.3);
+}
+
+.card-back{
+transform: rotateY(180deg);
+background:#ffd60a;
+}
+
+.hidden{
+display:none;
+}
+
+.quiz-box{
+background:white;
+color:black;
+padding:20px;
+border-radius:15px;
+width:300px;
+margin:auto;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>📚 FlashHistoire</header>
+
+<div id="menu" class="container">
+
+<h2>Réviser l'industrialisation</h2>
+
+<button onclick="startFlash()">Flashcards</button>
+<button onclick="startQuiz()">Quiz</button>
+
+</div>
+
+<div id="flashcards" class="container hidden">
+
+<div class="card" onclick="flipCard()">
+<div class="card-inner" id="cardInner">
+
+<div class="card-face" id="question"></div>
+<div class="card-face card-back" id="answer"></div>
+
+</div>
+</div>
+
+<br>
+
+<button onclick="nextCard()">Carte suivante</button>
+<button onclick="backMenu()">Menu</button>
+
+</div>
+
+<div id="quiz" class="container hidden">
+
+<div class="quiz-box">
+<h3 id="quizQuestion"></h3>
+
+<div id="quizAnswers"></div>
+
+</div>
+
+<br>
+
+<button onclick="backMenu()">Menu</button>
+
+</div>
+
+<script>
+
+const flashcards = [
+
+{
+q:"Qu'est-ce que l'industrialisation ?",
+a:"Le passage d'une économie agricole à une économie basée sur l'industrie et les machines."
+},
+
+{
+q:"Pourquoi la France s'industrialise plus lentement que l'Angleterre ?",
+a:"Parce qu'elle reste longtemps très agricole et investit moins dans l'industrie."
+},
+
+{
+q:"Quel rôle jouent les chemins de fer au XIXe siècle ?",
+a:"Ils facilitent le transport des marchandises et des personnes et développent le commerce."
+},
+
+{
+q:"Qui sont les acteurs de la modernisation économique ?",
+a:"Les entrepreneurs, les banques, les investisseurs et l'État."
+},
+
+{
+q:"Quelles transformations touchent l'agriculture ?",
+a:"La mécanisation, de nouvelles techniques et l'augmentation de la production."
+},
+
+{
+q:"Quelles tensions sociales apparaissent au XIXe siècle ?",
+a:"Les ouvriers travaillent dans des conditions difficiles et contestent parfois les patrons."
+}
+
+]
+
+let currentCard = 0
+
+function startFlash(){
+document.getElementById("menu").classList.add("hidden")
+document.getElementById("flashcards").classList.remove("hidden")
+showCard()
+}
+
+function showCard(){
+document.getElementById("question").innerText=flashcards[currentCard].q
+document.getElementById("answer").innerText=flashcards[currentCard].a
+}
+
+function flipCard(){
+document.querySelector(".card").classList.toggle("flip")
+}
+
+function nextCard(){
+document.querySelector(".card").classList.remove("flip")
+currentCard++
+if(currentCard>=flashcards.length){currentCard=0}
+showCard()
+}
+
+const quizData=[
+
+{
+q:"Quel transport développe le commerce au XIXe siècle ?",
+answers:["Vélo","Train","Avion"],
+correct:1
+},
+
+{
+q:"Que permet la mécanisation agricole ?",
+answers:["Moins produire","Produire plus vite","Supprimer l'agriculture"],
+correct:1
+},
+
+{
+q:"Qui investit dans l'industrie ?",
+answers:["Les banques et entrepreneurs","Les paysans uniquement","Les artistes"],
+correct:0
+}
+
+]
+
+let quizIndex=0
+
+function startQuiz(){
+document.getElementById("menu").classList.add("hidden")
+document.getElementById("quiz").classList.remove("hidden")
+showQuiz()
+}
+
+function showQuiz(){
+
+let q=quizData[quizIndex]
+
+document.getElementById("quizQuestion").innerText=q.q
+
+let answersHTML=""
+
+q.answers.forEach((a,i)=>{
+answersHTML+=`<button onclick="checkAnswer(${i})">${a}</button><br>`
+})
+
+document.getElementById("quizAnswers").innerHTML=answersHTML
+}
+
+function checkAnswer(i){
+
+if(i===quizData[quizIndex].correct){
+alert("Bonne réponse ! 🎉")
+}else{
+alert("Faux !")
+}
+
+quizIndex++
+
+if(quizIndex>=quizData.length){
+quizIndex=0
+}
+
+showQuiz()
+}
+
+function backMenu(){
+
+document.getElementById("flashcards").classList.add("hidden")
+document.getElementById("quiz").classList.add("hidden")
+document.getElementById("menu").classList.remove("hidden")
+
+}
+
+</script>
+
+</body>
+</html>
