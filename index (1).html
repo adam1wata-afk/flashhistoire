@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashHistoire</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FlashHistoire">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f0f2f5; color: #222; min-height: 100vh; }
+header { background: #2c3e7a; color: white; padding: 18px 20px; font-size: 22px; font-weight: bold; text-align: center; }
+.container { max-width: 600px; margin: 30px auto; padding: 0 16px; }
+button { cursor: pointer; font-family: Arial, sans-serif; }
+.btn { background: #2c3e7a; color: white; border: none; border-radius: 8px; padding: 12px 22px; font-size: 15px; margin: 6px; transition: background 0.2s; }
+.btn:hover { background: #1e2d5e; }
+.btn.outline { background: white; color: #2c3e7a; border: 2px solid #2c3e7a; }
+.btn.outline:hover { background: #eef0fa; }
+.menu-title { font-size: 17px; color: #555; margin-bottom: 20px; line-height: 1.5; }
+.menu-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 30px; }
+.big-btn { flex: 1; min-width: 130px; background: white; border: 2px solid #ddd; border-radius: 10px; padding: 20px 14px; text-align: center; cursor: pointer; transition: border-color 0.2s; }
+.big-btn:hover { border-color: #2c3e7a; }
+.big-btn .icon { font-size: 28px; margin-bottom: 8px; }
+.big-btn .label { font-size: 15px; font-weight: bold; color: #222; }
+.big-btn .sub { font-size: 12px; color: #888; margin-top: 3px; }
+.theme-title { font-size: 13px; font-weight: bold; color: #888; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
+.theme-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.theme-btn { background: white; border: 1.5px solid #ddd; border-radius: 20px; padding: 7px 16px; font-size: 13px; color: #444; transition: all 0.2s; }
+.theme-btn:hover { border-color: #2c3e7a; color: #2c3e7a; }
+.back-btn { background: none; border: none; color: #888; font-size: 14px; margin-bottom: 16px; padding: 0; display: flex; align-items: center; gap: 4px; }
+.back-btn:hover { color: #222; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.tab { background: white; border: 1.5px solid #ddd; border-radius: 6px; padding: 6px 14px; font-size: 13px; color: #555; }
+.tab.active { background: #2c3e7a; color: white; border-color: #2c3e7a; }
+.card-count { text-align: center; color: #888; font-size: 13px; margin-bottom: 12px; }
+.card-wrap { width: 100%; height: 210px; perspective: 1000px; cursor: pointer; margin-bottom: 18px; }
+.card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.5s; transform-style: preserve-3d; }
+.card-wrap.flip .card-inner { transform: rotateY(180deg); }
+.card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; font-size: 17px; text-align: center; line-height: 1.5; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.card-front { background: #2c3e7a; color: white; }
+.card-front .hint { font-size: 12px; opacity: 0.5; position: absolute; bottom: 14px; }
+.card-back { background: #ffd60a; color: #222; transform: rotateY(180deg); font-weight: bold; font-size: 16px; }
+.cat-label { position: absolute; top: 10px; right: 12px; font-size: 11px; background: rgba(255,255,255,0.2); border-radius: 10px; padding: 2px 8px; }
+.nav-btns { display: flex; justify-content: center; gap: 10px; }
+.progress-bar { height: 8px; background: #ddd; border-radius: 4px; margin-bottom: 18px; overflow: hidden; }
+.progress-fill { height: 100%; background: #2c3e7a; border-radius: 4px; transition: width 0.3s; width: 0%; }
+.quiz-num { font-size: 13px; color: #888; margin-bottom: 12px; }
+.quiz-box { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 14px; }
+.quiz-question { font-size: 16px; font-weight: bold; margin-bottom: 16px; line-height: 1.4; }
+.answer-btn { display: block; width: 100%; background: #f5f6fa; border: 1.5px solid #ddd; border-radius: 8px; padding: 11px 14px; text-align: left; font-size: 14px; color: #333; margin-bottom: 8px; transition: all 0.15s; }
+.answer-btn:hover:not(:disabled) { border-color: #2c3e7a; background: #eef0fa; }
+.answer-btn.correct { background: #e6f9ef; border-color: #27ae60; color: #1e8449; }
+.answer-btn.wrong { background: #fdecea; border-color: #e74c3c; color: #c0392b; }
+.answer-btn:disabled { cursor: default; }
+.result-box { background: white; border-radius: 10px; padding: 28px 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+.result-score { font-size: 48px; font-weight: bold; color: #2c3e7a; }
+.result-label { font-size: 18px; font-weight: bold; margin: 8px 0 4px; }
+.result-sub { color: #888; font-size: 14px; margin-bottom: 20px; }
+
+/* FICHES */
+.fiche-section { background: white; border-radius: 10px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); overflow: hidden; }
+.fiche-header { padding: 14px 18px; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+.fiche-header:hover { background: #f5f6fa; }
+.fiche-body { padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s; }
+.fiche-section.open .fiche-body { max-height: 1000px; padding: 0 18px 16px; }
+.fiche-arrow { font-size: 13px; color: #aaa; transition: transform 0.3s; }
+.fiche-section.open .fiche-arrow { transform: rotate(180deg); }
+.fiche-body p { font-size: 14px; line-height: 1.7; color: #444; margin-bottom: 10px; }
+.fiche-body p:last-child { margin-bottom: 0; }
+.fiche-body strong { color: #2c3e7a; }
+.fiche-body ul { padding-left: 18px; font-size: 14px; line-height: 1.8; color: #444; }
+
+/* VIDEO */
+.video-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 10px; }
+.video-label { font-size: 13px; color: #888; margin-bottom: 10px; }
+
+.divider { height: 1px; background: #e0e0e0; margin: 24px 0; }
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>📚 FlashHistoire</header>
+
+<!-- MENU -->
+<div id="menu" class="container">
+  <p class="menu-title" style="margin-top:8px">Industrialisation et transformations économiques et sociales en France</p>
+  <div class="menu-btns">
+    <div class="big-btn" onclick="showSection('flashcards'); startFlash('all')">
+      <div class="icon">🃏</div><div class="label">Flashcards</div><div class="sub">52 cartes</div>
+    </div>
+    <div class="big-btn" onclick="showSection('quiz'); startQuiz()">
+      <div class="icon">🎯</div><div class="label">Quiz</div><div class="sub">30 questions</div>
+    </div>
+    <div class="big-btn" onclick="showSection('fiches')">
+      <div class="icon">📄</div><div class="label">Fiches</div><div class="sub">Résumés du cours</div>
+    </div>
+    <div class="big-btn" onclick="showSection('video')">
+      <div class="icon">▶️</div><div class="label">Vidéo</div><div class="sub">YouTube</div>
+    </div>
+  </div>
+  <div class="theme-title">Flashcards par thème</div>
+  <div class="theme-btns">
+    <button class="theme-btn" onclick="showSection('flashcards'); startFlash('dates')">📅 Dates</button>
+    <button class="theme-btn" onclick="showSection('flashcards'); startFlash('notions')">📖 Notions</button>
+    <button class="theme-btn" onclick="showSection('flashcards'); startFlash('acteurs')">👤 Acteurs</button>
+    <button class="theme-btn" onclick="showSection('flashcards'); startFlash('social')">⚖️ Social</button>
+    <button class="theme-btn" onclick="showSection('flashcards'); startFlash('rural')">🌾 Rural</button>
+  </div>
+</div>
+
+<!-- FLASHCARDS -->
+<div id="flashcards" class="container hidden">
+  <button class="back-btn" onclick="showSection('menu')">← Retour</button>
+  <div class="tabs">
+    <button class="tab" onclick="startFlash('all')">Toutes</button>
+    <button class="tab" onclick="startFlash('dates')">Dates</button>
+    <button class="tab" onclick="startFlash('notions')">Notions</button>
+    <button class="tab" onclick="startFlash('acteurs')">Acteurs</button>
+    <button class="tab" onclick="startFlash('social')">Social</button>
+    <button class="tab" onclick="startFlash('rural')">Rural</button>
+  </div>
+  <div class="card-count" id="cardCounter"></div>
+  <div class="card-wrap" id="flashCard" onclick="flipCard()">
+    <div class="card-inner">
+      <div class="card-face card-front">
+        <span class="cat-label" id="catBadge"></span>
+        <div id="question"></div>
+        <span class="hint">Appuyer pour retourner</span>
+      </div>
+      <div class="card-face card-back" id="answer"></div>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn outline" onclick="prevCard()">← Précédente</button>
+    <button class="btn" onclick="nextCard()">Suivante →</button>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="container hidden">
+  <button class="back-btn" onclick="showSection('menu')">← Retour</button>
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="quiz-num" id="quizNum"></div>
+  <div id="quizContent"></div>
+</div>
+
+<!-- FICHES -->
+<div id="fiches" class="container hidden">
+  <button class="back-btn" onclick="showSection('menu')">← Retour</button>
+  <p style="font-size:17px;font-weight:bold;margin-bottom:18px;">📄 Fiches de révision</p>
+
+  <div class="fiche-section">
+    <div class="fiche-header" onclick="toggleFiche(this)">
+      I. Industrialisation et modernisation <span class="fiche-arrow">▼</span>
+    </div>
+    <div class="fiche-body">
+      <p>La <strong>révolution industrielle</strong> désigne la transformation profonde de l'économie par l'industrie mécanisée. Elle débute en <strong>Angleterre fin XVIIIe s.</strong> La France accuse un retard : pays encore très agricole, peu productif, manque d'investisseurs.</p>
+      <p>L'industrialisation s'accélère en France <strong>vers 1850</strong> grâce au soutien de l'État (Napoléon III) : financement des chemins de fer, traité de libre-échange avec l'Angleterre (1860), rénovation de Paris par Haussmann.</p>
+      <p>Le <strong>saint-simonisme</strong> est le courant de pensée dominant : il prône le progrès industriel, scientifique et technologique. Les <strong>Frères Pereire</strong> en sont l'exemple : banquiers qui financent les chemins de fer et rassemblent les capitaux de la bourgeoisie.</p>
+      <p>Le <strong>libéralisme économique</strong> s'impose : liberté d'entreprendre, libre concurrence, non-intervention de l'État dans l'économie. Mais le traité avec l'Angleterre est critiqué par la bourgeoisie industrielle qui craint la concurrence.</p>
+    </div>
+  </div>
+
+  <div class="fiche-section">
+    <div class="fiche-header" onclick="toggleFiche(this)">
+      II. Transports et territoires <span class="fiche-arrow">▼</span>
+    </div>
+    <div class="fiche-body">
+      <p>Le <strong>chemin de fer</strong> est la grande révolution des transports du XIXe s. En France : ~3 000 km en 1850, puis <strong>~17 000 km vers 1870</strong> (multiplié par 5 en 20 ans).</p>
+      <p>Les effets sont majeurs : désenclavement des régions, transport rapide des marchandises, hausse des revenus agricoles, accélération de l'exode rural. Les ports comme Le Havre voient leur activité exploser.</p>
+      <p>Les travaux <strong>haussmanniens à Paris (1853-1869)</strong> transforment la capitale : grands boulevards, égouts, parcs. Budget colossal, 600 000 ouvriers mobilisés. Les plus pauvres sont repoussés vers la périphérie (Lyon, Bordeaux, Marseille).</p>
+      <p>La <strong>photographie</strong> couvre presque toute la France vers 1860 : la révolution des transports est accomplie.</p>
+    </div>
+  </div>
+
+  <div class="fiche-section">
+    <div class="fiche-header" onclick="toggleFiche(this)">
+      III. Transformations de la France rurale <span class="fiche-arrow">▼</span>
+    </div>
+    <div class="fiche-body">
+      <p>La France reste majoritairement agricole. L'agriculture se modernise : <strong>mécanisation</strong> (moissonneuses, batteuses), engrais chimiques, amélioration des semences → hausse des rendements.</p>
+      <p>Le chemin de fer désenclave les campagnes et permet le transport des denrées. Les revenus des agriculteurs augmentent. Mais beaucoup de paysans quittent les campagnes pour les villes : c'est l'<strong>exode rural</strong>.</p>
+      <p>L'État développe aussi la politique sanitaire, l'instruction publique et les infrastructures rurales. La France passe progressivement d'une économie agricole à industrielle, sans jamais rattraper totalement l'Angleterre.</p>
+    </div>
+  </div>
+
+  <div class="fiche-section">
+    <div class="fiche-header" onclick="toggleFiche(this)">
+      IV. Tensions sociales : ouvriers et bourgeois <span class="fiche-arrow">▼</span>
+    </div>
+    <div class="fiche-body">
+      <p>Les <strong>conditions ouvrières</strong> sont très difficiles : journées de 12 à 15h, salaires très bas, travail dangereux (mines, usines). Logements insalubres : les <strong>corons</strong>. Pas de protection sociale.</p>
+      <p>Les enfants travaillent dès 8 ans. La loi de <strong>1841</strong> est la première protection : interdit le travail sous 8 ans, limite à 8h/jour pour les 8-12 ans. Peu respectée faute d'inspecteurs.</p>
+      <p>Les <strong>revendications ouvrières</strong> : augmentation des salaires, journée de 8h, suppression du travail des enfants, reconnaissance des syndicats. En 1864 Napoléon III légalise la grève (calcul politique). En <strong>1884</strong>, loi Waldeck-Rousseau : liberté syndicale complète.</p>
+      <p>La <strong>bourgeoisie</strong> se divise : grande (grands patrons, banquiers), moyenne (petits patrons, médecins), petite (boutiquiers, notaires). Elle ne travaille pas de ses mains. Sa vie sociale : voyages, bals, éducation des enfants.</p>
+      <p>Les <strong>tensions</strong> entre les deux classes viennent des inégalités que les ouvriers ressentent profondément. Zola les décrit dans <em>Germinal</em> (1885) pour les mineurs et dans <em>Au Bonheur des Dames</em> (1883) pour les grands magasins.</p>
+    </div>
+  </div>
+
+  <div class="fiche-section">
+    <div class="fiche-header" onclick="toggleFiche(this)">
+      V. Dates clés à retenir <span class="fiche-arrow">▼</span>
+    </div>
+    <div class="fiche-body">
+      <ul>
+        <li><strong>Fin XVIIIe s.</strong> — 1ère révolution industrielle en Angleterre</li>
+        <li><strong>1760-1782</strong> — James Watt perfectionne la machine à vapeur</li>
+        <li><strong>1825</strong> — Stephenson : 1ère locomotive commerciale</li>
+        <li><strong>~1850</strong> — Accélération industrielle en France</li>
+        <li><strong>1841</strong> — 1ère loi sur le travail des enfants</li>
+        <li><strong>1853-1869</strong> — Travaux haussmanniens à Paris</li>
+        <li><strong>1860</strong> — Traité de libre-échange avec l'Angleterre</li>
+        <li><strong>1864</strong> — Légalisation du droit de grève</li>
+        <li><strong>~1870</strong> — 17 000 km de voies ferrées</li>
+        <li><strong>1883</strong> — Zola, Au Bonheur des Dames</li>
+        <li><strong>1884</strong> — Liberté syndicale (Waldeck-Rousseau)</li>
+        <li><strong>1885</strong> — Zola, Germinal</li>
+        <li><strong>Fin XIXe s.</strong> — France : 4e puissance industrielle</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO -->
+<div id="video" class="container hidden">
+  <button class="back-btn" onclick="showSection('menu')">← Retour</button>
+  <p style="font-size:17px;font-weight:bold;margin-bottom:6px;">▶️ Vidéo de révision</p>
+  <p style="font-size:14px;color:#555;margin-bottom:16px;">Une vidéo de révision pour compléter le cours :</p>
+  <a href="https://www.youtube.com/watch?v=l0lqBVbk6KY" target="_blank" style="display:block;background:white;border:2px solid #ddd;border-radius:10px;padding:16px 18px;text-decoration:none;color:#222;transition:border-color 0.2s;">
+    <div style="font-size:13px;color:#888;margin-bottom:4px;">▶️ YouTube</div>
+    <div style="font-weight:bold;font-size:15px;">L'industrialisation en France — révision complète</div>
+    <div style="font-size:13px;color:#2c3e7a;margin-top:6px;">youtube.com/watch?v=l0lqBVbk6KY</div>
+  </a>
+  <p style="font-size:13px;color:#888;margin-top:12px;">💡 Regarde après les flashcards pour consolider le cours.</p>
+</div>
+
+<script>
+const allCards = [
+  {cat:'notions', q:"Définition : Industrialisation", a:"Processus de transformation économique marqué par le développement des industries et de la production mécanisée."},
+  {cat:'notions', q:"Définition : Exode rural", a:"Départ massif des populations rurales vers les villes industrielles, accéléré par la mécanisation agricole."},
+  {cat:'notions', q:"Définition : Capitalisme industriel", a:"Système économique basé sur l'investissement de capitaux privés pour produire et réaliser un profit."},
+  {cat:'notions', q:"Définition : Urbanisation", a:"Processus d'augmentation de la population dans les villes, lié à l'industrialisation et à l'exode rural."},
+  {cat:'notions', q:"Définition : Libéralisme économique", a:"Doctrine prônant la liberté d'entreprendre, la libre concurrence et la non-intervention de l'État dans l'économie."},
+  {cat:'notions', q:"Qu'est-ce que le saint-simonisme ?", a:"Courant de pensée du XIXe s. prônant le progrès industriel, scientifique et technologique au service de l'humanité."},
+  {cat:'notions', q:"Qu'est-ce qu'un syndicat ?", a:"Organisation collective de travailleurs défendant leurs droits, salaires et conditions de travail face aux patrons."},
+  {cat:'notions', q:"Qu'est-ce que la mécanisation des usines ?", a:"Remplacement du travail manuel par des machines, augmentant la productivité mais transformant les conditions de travail."},
+  {cat:'notions', q:"Bourgeoisie : quelles sous-catégories ?", a:"Grande bourgeoisie (grands patrons, banquiers), moyenne (petits patrons, médecins), petite (boutiquiers, notaires)."},
+  {cat:'notions', q:"Qu'est-ce que la société de consommation naissante ?", a:"Phénomène du XIXe s. où les grands magasins proposent tout au même endroit et concurrencent les petits commerces."},
+  {cat:'social', q:"Conditions de vie ouvrière au XIXe s.", a:"Journées de 12 à 15h, salaires bas, travail dangereux, logements insalubres (corons), absence de protection sociale."},
+  {cat:'social', q:"Qu'est-ce qu'un 'coron' ?", a:"Logement ouvrier rudimentaire et insalubre, situé près des usines ou des mines."},
+  {cat:'social', q:"Loi de 1841 : que dit-elle ?", a:"Première loi sociale en France : interdit le travail des moins de 8 ans, limite à 8h/jour pour les 8-12 ans."},
+  {cat:'social', q:"Loi de 1864 : que dit-elle ?", a:"Légalisation du droit de grève en France. Les ouvriers peuvent cesser le travail collectivement sans être poursuivis."},
+  {cat:'social', q:"Loi Waldeck-Rousseau (1884) : que dit-elle ?", a:"Liberté syndicale complète en France. Les syndicats ouvriers peuvent se constituer librement."},
+  {cat:'social', q:"Revendications ouvrières au XIXe s.", a:"Augmentation des salaires, journée de 8h, suppression du travail des enfants, reconnaissance des syndicats."},
+  {cat:'social', q:"Pourquoi Napoléon III accorde-t-il le droit de grève en 1864 ?", a:"Calcul politique pour attirer le soutien ouvrier. Mais les travailleurs se tournent finalement vers les républicains."},
+  {cat:'social', q:"Mode de vie bourgeois au XIXe s.", a:"Voyages, résidences secondaires, éducation des enfants, soirées mondaines et bals comme centre de la vie sociale."},
+  {cat:'social', q:"Que dénonce Zola dans Germinal (1885) ?", a:"Conditions des mineurs : chaleur à 35°C, danger permanent, salaires insuffisants, conflits violents avec les patrons."},
+  {cat:'social', q:"Que décrit Zola dans Au Bonheur des Dames (1883) ?", a:"La naissance des grands magasins et le début de la société de consommation. Ruine des petits commerces."},
+  {cat:'social', q:"Tensions sociales : causes principales", a:"Inégalités criantes entre bourgeoisie (riche) et ouvriers (exploités). Source des grèves et mouvements sociaux."},
+  {cat:'acteurs', q:"James Watt", a:"Ingénieur écossais (1736-1819). Perfectionne la machine à vapeur vers 1765-1782, moteur essentiel de la révolution industrielle."},
+  {cat:'acteurs', q:"Émile Zola", a:"Écrivain naturaliste français. Décrit la société industrielle dans Germinal (1885) et Au Bonheur des Dames (1883)."},
+  {cat:'acteurs', q:"Les Frères Pereire", a:"Grands banquiers saint-simoniens. Créent le Crédit mobilier et financent les chemins de fer et l'industrie."},
+  {cat:'acteurs', q:"George Stephenson", a:"Ingénieur anglais pionnier du chemin de fer. Crée la première locomotive à vapeur commerciale (1825)."},
+  {cat:'acteurs', q:"Haussmann (Baron)", a:"Préfet de Paris sous Napoléon III. Rénove Paris : grands boulevards, égouts, parcs. Les plus pauvres repoussés vers la périphérie."},
+  {cat:'acteurs', q:"Napoléon III et l'industrialisation", a:"Soutient l'industrie : chemins de fer, traité de libre-échange (1860), rénovation de Paris. Modernisation de la France."},
+  {cat:'rural', q:"Transformations agricoles au XIXe s.", a:"Mécanisation, engrais chimiques, amélioration des semences, augmentation des rendements. La France reste plus rurale que l'Angleterre."},
+  {cat:'rural', q:"Impact du chemin de fer sur les campagnes", a:"Désenclave les villages, accélère le transport des marchandises, augmente les revenus des agriculteurs."},
+  {cat:'rural', q:"Pourquoi la France industrialise-t-elle plus lentement ?", a:"Manque d'investisseurs, agriculture dominante, moins de charbon, structure sociale peu favorable au risque industriel."},
+  {cat:'rural', q:"Comment l'État intervient-il dans les campagnes ?", a:"Finance les infrastructures (routes, voies ferrées), encourage la mécanisation, développe la politique sanitaire."},
+  {cat:'rural', q:"Qu'est-ce que la mécanisation agricole ?", a:"Introduction de machines (moissonneuses, batteuses) libérant de la main-d'oeuvre qui part vers les usines."},
+  {cat:'dates', q:"Fin XVIIIe siècle", a:"Début de la 1ère révolution industrielle en Angleterre."},
+  {cat:'dates', q:"1760-1782", a:"James Watt perfectionne la machine à vapeur."},
+  {cat:'dates', q:"~1825", a:"George Stephenson : première locomotive à vapeur commerciale en Angleterre."},
+  {cat:'dates', q:"~1850", a:"Accélération de l'industrialisation en France. Environ 3 000 km de voies ferrées."},
+  {cat:'dates', q:"1841", a:"Première loi sociale en France : restriction du travail des enfants dans les usines."},
+  {cat:'dates', q:"1853-1869", a:"Travaux haussmanniens à Paris : 600 000 ouvriers, rénovation totale de la capitale."},
+  {cat:'dates', q:"1860", a:"Traité de libre-échange avec l'Angleterre signé par Napoléon III."},
+  {cat:'dates', q:"1864", a:"Légalisation du droit de grève en France."},
+  {cat:'dates', q:"~1870", a:"17 000 km de voies ferrées en France. Réseau multiplié par 5 en 20 ans."},
+  {cat:'dates', q:"1883", a:"Zola publie Au Bonheur des Dames : naissance des grands magasins."},
+  {cat:'dates', q:"1884", a:"Loi Waldeck-Rousseau : liberté syndicale complète en France."},
+  {cat:'dates', q:"1885", a:"Zola publie Germinal : la misère des mineurs du Nord."},
+  {cat:'dates', q:"Fin XIXe s.", a:"La France est la 4e puissance industrielle mondiale."},
+];
+
+const quizData = [
+  {q:"Quel pays est pionnier de la révolution industrielle ?", answers:["Angleterre","France","Allemagne","Italie"], correct:"Angleterre"},
+  {q:"Quelle énergie alimente principalement les machines au XIXe s. ?", answers:["Charbon","Pétrole","Électricité","Bois"], correct:"Charbon"},
+  {q:"Quel phénomène désigne le départ massif des paysans vers les villes ?", answers:["Exode rural","Migration coloniale","Urbanisme planifié","Nomadisme"], correct:"Exode rural"},
+  {q:"Quelle doctrine prône la non-intervention de l'État dans l'économie ?", answers:["Libéralisme économique","Socialisme","Communisme","Mercantilisme"], correct:"Libéralisme économique"},
+  {q:"Quel transport révolutionne l'économie au XIXe s. ?", answers:["Chemin de fer","Diligence","Canal","Navigation à voile"], correct:"Chemin de fer"},
+  {q:"Vers quelle date l'industrialisation s'accélère-t-elle en France ?", answers:["1850","1789","1914","1750"], correct:"1850"},
+  {q:"Combien de km de voies ferrées la France compte-t-elle vers 1870 ?", answers:["17 000 km","3 000 km","500 km","50 000 km"], correct:"17 000 km"},
+  {q:"Quel accord commercial Napoléon III signe-t-il en 1860 ?", answers:["Traité de libre-échange avec l'Angleterre","Traité de Paris","Alliance franco-russe","Concordat"], correct:"Traité de libre-échange avec l'Angleterre"},
+  {q:"Quelle classe sociale possède les moyens de production ?", answers:["Bourgeoisie","Paysannerie","Clergé","Noblesse"], correct:"Bourgeoisie"},
+  {q:"Qu'est-ce qu'un 'coron' ?", answers:["Logement ouvrier rudimentaire","Quartier bourgeois","Usine textile","Mine de charbon"], correct:"Logement ouvrier rudimentaire"},
+  {q:"En quelle année le droit de grève est-il légalisé en France ?", answers:["1864","1789","1848","1884"], correct:"1864"},
+  {q:"Quelle loi de 1884 concerne les travailleurs ?", answers:["Liberté syndicale","Journée de 8h","Salaire minimum","Retraite ouvrière"], correct:"Liberté syndicale"},
+  {q:"Quelle loi de 1841 protège les travailleurs les plus vulnérables ?", answers:["Travail des enfants","Droit de grève","Durée légale","Sécurité des mines"], correct:"Travail des enfants"},
+  {q:"Quelle est la durée typique d'une journée de travail ouvrier au XIXe s. ?", answers:["12 à 15 heures","8 heures","6 heures","10 heures"], correct:"12 à 15 heures"},
+  {q:"Qui écrit Germinal en 1885 ?", answers:["Émile Zola","Victor Hugo","Balzac","Lamartine"], correct:"Émile Zola"},
+  {q:"Dans Au Bonheur des Dames, Zola décrit quoi ?", answers:["La naissance des grands magasins","Les mines du Nord","La guerre de 1870","La réforme agraire"], correct:"La naissance des grands magasins"},
+  {q:"Pourquoi Napoléon III accorde-t-il le droit de grève en 1864 ?", answers:["Calcul politique","Conviction sociale","Pression anglaise","Révolution ouvrière"], correct:"Calcul politique"},
+  {q:"Qui perfectionne la machine à vapeur ?", answers:["James Watt","Stephenson","Pasteur","Eiffel"], correct:"James Watt"},
+  {q:"Qui rénove Paris sous Napoléon III ?", answers:["Haussmann","Thiers","Gambetta","Carnot"], correct:"Haussmann"},
+  {q:"Qu'arrive-t-il aux plus pauvres lors des travaux haussmanniens ?", answers:["Repoussés vers la périphérie","Relogés en HLM","Envoyés en colonies","Regroupés à Versailles"], correct:"Repoussés vers la périphérie"},
+  {q:"Quel secteur domine l'économie française avant 1850 ?", answers:["Agriculture","Industrie","Commerce maritime","Finance"], correct:"Agriculture"},
+  {q:"Quel impact le chemin de fer a-t-il sur les campagnes ?", answers:["Désenclavement et hausse des revenus","Déclin agricole","Isolement des villages","Réduction des échanges"], correct:"Désenclavement et hausse des revenus"},
+  {q:"Quel courant de pensée prône le progrès industriel et scientifique ?", answers:["Saint-simonisme","Romantisme","Jansénisme","Libéralisme"], correct:"Saint-simonisme"},
+  {q:"Quel métal devient essentiel à l'industrie au XIXe s. ?", answers:["Acier","Cuivre","Bronze","Plomb"], correct:"Acier"},
+  {q:"Que font les Frères Pereire ?", answers:["Financent les chemins de fer et l'industrie","Construisent des cathédrales","Dirigent l'armée","Réforment l'agriculture"], correct:"Financent les chemins de fer et l'industrie"},
+  {q:"La bourgeoisie se divise en combien de sous-groupes ?", answers:["3 (grande, moyenne, petite)","2 (riche et pauvre)","4","Elle ne se divise pas"], correct:"3 (grande, moyenne, petite)"},
+  {q:"Quelle conséquence sociale majeure l'industrialisation entraîne-t-elle ?", answers:["Accentuation des inégalités","Égalité économique","Disparition des classes","Fin de la pauvreté"], correct:"Accentuation des inégalités"},
+  {q:"Où George Stephenson crée-t-il la première locomotive commerciale ?", answers:["Angleterre","France","Allemagne","États-Unis"], correct:"Angleterre"},
+  {q:"Quel rang mondial la France occupe-t-elle industriellement fin XIXe s. ?", answers:["4e puissance","1ère puissance","2e puissance","Dernière"], correct:"4e puissance"},
+  {q:"Quel est l'objectif des grands magasins selon Zola ?", answers:["Tout vendre au même endroit pour attirer les clients","Remplacer les usines","Nourrir les ouvriers","Éduquer la bourgeoisie"], correct:"Tout vendre au même endroit pour attirer les clients"},
+];
+
+let currentCards = [], currentCard = 0;
+let quizIndex = 0, score = 0, shuffledQuiz = [];
+
+function showSection(id) {
+  ['menu','flashcards','quiz','fiches','video'].forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function toggleFiche(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startFlash(cat) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const cats = ['all','dates','notions','acteurs','social','rural'];
+  const idx = cats.indexOf(cat);
+  if (idx >= 0) document.querySelectorAll('.tab')[idx].classList.add('active');
+  currentCards = cat === 'all' ? shuffle(allCards) : shuffle(allCards.filter(c => c.cat === cat));
+  currentCard = 0;
+  document.getElementById('flashCard').classList.remove('flip');
+  showCard();
+}
+
+function showCard() {
+  if (!currentCards.length) return;
+  const c = currentCards[currentCard];
+  document.getElementById('question').innerText = c.q;
+  document.getElementById('answer').innerText = c.a;
+  document.getElementById('cardCounter').innerText = (currentCard + 1) + ' / ' + currentCards.length;
+  const badges = {dates:'Date',notions:'Notion',acteurs:'Acteur',social:'Social',rural:'Rural'};
+  document.getElementById('catBadge').innerText = badges[c.cat] || '';
+}
+
+function flipCard() { document.getElementById('flashCard').classList.toggle('flip'); }
+function nextCard() { document.getElementById('flashCard').classList.remove('flip'); currentCard = (currentCard + 1) % currentCards.length; showCard(); }
+function prevCard() { document.getElementById('flashCard').classList.remove('flip'); currentCard = (currentCard - 1 + currentCards.length) % currentCards.length; showCard(); }
+
+function startQuiz() {
+  shuffledQuiz = shuffle(quizData);
+  quizIndex = 0; score = 0;
+  updateProgress(); showQuiz();
+}
+
+function updateProgress() {
+  document.getElementById('progress').style.width = (quizIndex / shuffledQuiz.length * 100) + '%';
+  const el = document.getElementById('quizNum');
+  if (el && quizIndex < shuffledQuiz.length)
+    el.innerText = 'Question ' + (quizIndex + 1) + ' / ' + shuffledQuiz.length;
+}
+
+function showQuiz() {
+  if (quizIndex >= shuffledQuiz.length) { showResult(); return; }
+  const q = shuffledQuiz[quizIndex];
+  const sa = shuffle(q.answers);
+  let html = `<div class="quiz-box"><p class="quiz-question">${q.q}</p>`;
+  sa.forEach(a => {
+    const e = a.replace(/'/g, "\\'");
+    const ce = q.correct.replace(/'/g, "\\'");
+    html += `<button class="answer-btn" onclick="checkAnswer(this,'${e}','${ce}')">${a}</button>`;
+  });
+  html += `</div>`;
+  document.getElementById('quizContent').innerHTML = html;
+}
+
+function checkAnswer(btn, chosen, correct) {
+  document.querySelectorAll('.answer-btn').forEach(b => {
+    b.disabled = true;
+    if (b.innerText === correct) b.classList.add('correct');
+  });
+  if (chosen === correct) { btn.classList.add('correct'); score++; }
+  else btn.classList.add('wrong');
+  setTimeout(() => { quizIndex++; updateProgress(); showQuiz(); }, 950);
+}
+
+function showResult() {
+  const note = (score / shuffledQuiz.length * 20).toFixed(1);
+  const n = parseFloat(note);
+  const niveau = n >= 16 ? "Excellent 🎓" : n >= 12 ? "Bon niveau 👍" : n >= 8 ? "Niveau moyen 📖" : "À retravailler 📚";
+  document.getElementById('quizNum').innerText = '';
+  document.getElementById('quizContent').innerHTML = `
+    <div class="result-box">
+      <div style="font-size:40px;margin-bottom:10px">🏆</div>
+      <div class="result-score">${note}/20</div>
+      <div class="result-label">${niveau}</div>
+      <div class="result-sub">${score} bonnes réponses sur ${shuffledQuiz.length}</div>
+      <button class="btn" onclick="startQuiz()">Recommencer</button>
+      <button class="btn outline" onclick="showSection('menu')">Menu</button>
+    </div>`;
+  document.getElementById('progress').style.width = '100%';
+}
+
+startFlash('all');
+</script>
+</body>
+</html>
